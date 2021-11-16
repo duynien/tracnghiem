@@ -1,0 +1,79 @@
+package com.java.demo_ttcscn.enitities.model;
+
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Immutable;
+
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+import java.util.Set;
+
+@Entity
+@Table(name = "users")
+@Immutable
+public class User implements Serializable {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
+  private int id;
+
+  @Column(name = "email", nullable = false, unique = true)
+  private String email;
+
+  @JsonIgnore
+  @Column(name = "password", nullable = false)
+  private String password;
+
+  @Column(name = "username", nullable = false, unique = true)
+  private String username;
+
+  @JsonIgnore
+  @ManyToMany(cascade = CascadeType.MERGE)
+  @JoinTable(
+      name = "user_roles",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  private Set<Role> roles;
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public Set<Role> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(Set<Role> roles) {
+    this.roles = roles;
+  }
+}
