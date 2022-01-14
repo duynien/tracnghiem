@@ -5,6 +5,7 @@ import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,7 +49,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
   }
-
   @Bean
   @Override
   public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -64,22 +64,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests().antMatchers("/admin/**").hasRole("ADMIN");
 
     http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/403");
-    http.authorizeRequests()
-        .and()
-        .formLogin()
-        .loginProcessingUrl("/security_check")
-        .loginPage("/login")
-        .successHandler(customAuthenticationSuccessHandler)
-        .failureHandler(customAuthenticationFailureHandler)
-        .usernameParameter("username")
-        .passwordParameter("password")
-        .and()
-        .logout()
-        .logoutUrl("/logout")
-        .clearAuthentication(true)
-        .logoutSuccessUrl("/")
-        .deleteCookies("JSESSIONID")
-        .invalidateHttpSession(true);
+//    http.authorizeRequests()
+//        .and()
+//        .formLogin()
+//        .loginProcessingUrl("/security_check")
+//        .loginPage("/login")
+//        .successHandler(customAuthenticationSuccessHandler)
+//        .failureHandler(customAuthenticationFailureHandler)
+//        .usernameParameter("username")
+//        .passwordParameter("password")
+//        .and()
+//        .logout()
+//        .logoutUrl("/logout")
+//        .clearAuthentication(true)
+//        .logoutSuccessUrl("/")
+//        .deleteCookies("JSESSIONID")
+//        .invalidateHttpSession(true);
     http.authorizeRequests()
         .and()
         .rememberMe()

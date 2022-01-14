@@ -19,7 +19,7 @@ public class Lesson {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
-  private int id;
+  private int id = -12312;
 
   private String title;
   private String description;

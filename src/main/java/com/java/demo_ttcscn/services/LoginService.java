@@ -9,7 +9,9 @@ import com.java.demo_ttcscn.enitities.result.Response;
 import com.java.demo_ttcscn.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +27,8 @@ public class LoginService {
   @Autowired private PasswordEncoder encoder;
   @Autowired private UserRepository userRepository;
 
+//  DaoAuthenticationProvider
+//  @Autowired private AuthenticationProvider authenticationProvider;
   public Response handleLogin(LoginRequest loginRequest) {
     Response res;
     try {
