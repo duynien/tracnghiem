@@ -20,76 +20,81 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class AnswerServiceImpl extends BaseServiceImpl<Answer, AnswerDto> implements AnswerService {
-  @Autowired DecimalFormat df;
-  @Autowired private AnswerRepository answerRepository;
-  @Autowired private QuestionRepository questionRepository;
+    @Autowired
+    DecimalFormat df;
+    @Autowired
+    private AnswerRepository answerRepository;
+    @Autowired
+    private QuestionRepository questionRepository;
 
-  @Override
-  protected Class<Answer> classEntity() {
-    return Answer.class;
-  }
-
-  @Override
-  protected Class<AnswerDto> classDto() {
-    return AnswerDto.class;
-  }
-
-  @Override
-  protected BaseRepository<Answer> baseRepository() {
-    return answerRepository;
-  }
-
-  @Override
-  public AnswerResponse submitAnswer(String answerRequest) {
-    Map<Integer, String> mapAnswer = new HashMap<>();
-    AtomicReference<Double> point = new AtomicReference<>((double) 0);
-    AtomicInteger numberQuestionCorrect = new AtomicInteger();
-    int numberQuestion = 0;
-    List<String> content = new ArrayList<>();
-    StringTokenizer tokenizer = new StringTokenizer(answerRequest, "$");
-    //      numberQuestion = Integer.parseInt(answerRequest.trim().split("\\$")[0]);
-    numberQuestion = Integer.parseInt(tokenizer.nextToken());
-    tokenizer = new StringTokenizer(tokenizer.nextToken(), "&");
-    //      String verifyAnswers[] = answerRequest.trim().split("\\$")[1].trim().split("\\&");
-    double pointEveryQuestion = (double) 10 / numberQuestion;
-    while (tokenizer.hasMoreTokens()) {
-      String rs = tokenizer.nextToken();
-      mapAnswer.put(Integer.parseInt(rs.split("-")[0]), rs.split("-")[1]);
+    @Override
+    protected Class<Answer> classEntity() {
+        return Answer.class;
     }
-    mapAnswer.forEach(
-        (k, v) -> {
-          Question question = questionRepository.findById(k).get();
-          String correctAnswer = question.getAnswer().getCorrect_ans();
-          if (v.equals("No") || !v.equals(correctAnswer)) {
-            String nameQuestion = question.getName_question();
-            if (correctAnswer.equals("A")) {
-              content.add(nameQuestion +
-                      "\n<span class='text-success fw-bold'>A." + question.getAnswer().getAnsw_A()+"<span>");
-            } else if (correctAnswer.equals("B")) {
-              content.add(nameQuestion +
-                      "\n<span class='text-success fw-bold'>B." + question.getAnswer().getAnsw_B()+"<span>");
-            } else if (correctAnswer.equals("C")) {
-              content.add(nameQuestion +
-                      "\n<span class='text-success fw-bold'>C." + question.getAnswer().getAnsw_C()+"<span>");
-            } else if (correctAnswer.equals("D")) {
-              content.add(nameQuestion +
-                      "\n<span class='text-success fw-bold'>D." + question.getAnswer().getAnsw_D()+"<span>");
-            }
-          }
-          if (v.equals(correctAnswer)) {
-            numberQuestionCorrect.getAndIncrement();
-            point.updateAndGet(v1 -> new Double((double) (v1 + pointEveryQuestion)));
-          }
-        });
-    if (point.get() == 0) {
-      throw new NotFoundException("Chưa chọn đáp án hoặc bạn làm sai hết!");
-    } else {
-      AnswerResponse answerResponse = new AnswerResponse();
-      answerResponse.setNumberQuestionCorrect(numberQuestionCorrect.get());
-      answerResponse.setPoint(df.format(point.get()));
-      answerResponse.setNumberQuestion(numberQuestion);
-      answerResponse.setContent(content);
-      return answerResponse;
+
+    @Override
+    protected Class<AnswerDto> classDto() {
+        return AnswerDto.class;
     }
-  }
+
+    @Override
+    protected BaseRepository<Answer> baseRepository() {
+        return answerRepository;
+    }
+
+    @Override
+    public AnswerResponse submitAnswer(String answerRequest) {
+        Map<Integer, String> mapAnswer = new HashMap<>();
+        AtomicReference<Double> point = new AtomicReference<>((double) 0);
+        AtomicInteger numberQuestionCorrect = new AtomicInteger();
+        int numberQuestion = 0;
+        List<String> content = new ArrayList<>();
+        StringTokenizer tokenizer = new StringTokenizer(answerRequest, "$");
+        //      numberQuestion = Integer.parseInt(answerRequest.trim().split("\\$")[0]);
+        numberQuestion = Integer.parseInt(tokenizer.nextToken());
+        tokenizer = new StringTokenizer(tokenizer.nextToken(), "&");
+        //      String verifyAnswers[] = answerRequest.trim().split("\\$")[1].trim().split("\\&");
+        double pointEveryQuestion = (double) 10 / numberQuestion;
+        while (tokenizer.hasMoreTokens()) {
+            String rs = tokenizer.nextToken();
+            mapAnswer.put(Integer.parseInt(rs.split("-")[0]), rs.split("-")[1]);
+        }
+        mapAnswer.forEach(
+                (k, v) -> {
+                    Optional<Question> question = questionRepository.findById(k);
+                    question.ifPresent(question1 -> {
+                        String correctAnswer = question.get().getAnswer().getCorrect_ans();
+                        if (v.equals("No") || !v.equals(correctAnswer)) {
+                            String nameQuestion = question.get().getName_question();
+                            if (correctAnswer.equals("A")) {
+                                content.add(nameQuestion +
+                                        "\n<span class='text-success fw-bold'>A." + question.get().getAnswer().getAnsw_A() + "<span>");
+                            } else if (correctAnswer.equals("B")) {
+                                content.add(nameQuestion +
+                                        "\n<span class='text-success fw-bold'>B." + question.get().getAnswer().getAnsw_B() + "<span>");
+                            } else if (correctAnswer.equals("C")) {
+                                content.add(nameQuestion +
+                                        "\n<span class='text-success fw-bold'>C." + question.get().getAnswer().getAnsw_C() + "<span>");
+                            } else if (correctAnswer.equals("D")) {
+                                content.add(nameQuestion +
+                                        "\n<span class='text-success fw-bold'>D." + question.get().getAnswer().getAnsw_D() + "<span>");
+                            }
+                        }
+                        if (v.equals(correctAnswer)) {
+                            numberQuestionCorrect.getAndIncrement();
+                            point.updateAndGet(v1 -> (double) (v1 + pointEveryQuestion));
+                        }
+                    });
+                });
+        if (point.get() == 0) {
+            throw new NotFoundException("Chưa chọn đáp án hoặc bạn làm sai hết!");
+        } else {
+            AnswerResponse answerResponse = new AnswerResponse();
+            answerResponse.setNumberQuestionCorrect(numberQuestionCorrect.get());
+            answerResponse.setPoint(df.format(point.get()));
+            answerResponse.setNumberQuestion(numberQuestion);
+            answerResponse.setContent(content);
+            return answerResponse;
+        }
+    }
 }

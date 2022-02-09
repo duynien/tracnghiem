@@ -84,7 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .rememberMe()
         .tokenRepository(this.persistentTokenRepository()) //
-        .tokenValiditySeconds(1 * 24 * 60 * 60); // 24h
+        .tokenValiditySeconds(24 * 60 * 60); // 24h
 
     http.sessionManagement()
         .sessionFixation()
@@ -98,8 +98,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   public SessionRegistry sessionRegistry() {
-    SessionRegistry sessionRegistry = new SessionRegistryImpl();
-    return sessionRegistry;
+    return new SessionRegistryImpl();
   }
 
   @Bean

@@ -43,14 +43,12 @@ public class ResultQuestionServiceImpl extends BaseServiceImpl<ResultQuestion, R
   @Override
   public List<ResultQuestionDto> getResultByCode(String code) {
     try {
-      List<ResultQuestionDto> rs =
-          resultQuestionRepository.getResultByCodeQues(code).stream()
-              .map(source -> modelMapper.map(source, classDto()))
-              .collect(Collectors.toList());
-      return rs;
+      return resultQuestionRepository.getResultByCodeQues(code).stream()
+          .map(source -> modelMapper.map(source, classDto()))
+          .collect(Collectors.toList());
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw new NotFoundException("Not Found");
     }
   }
 
@@ -75,7 +73,7 @@ public class ResultQuestionServiceImpl extends BaseServiceImpl<ResultQuestion, R
   public List<ResultQuestionDto> getResultByUsernameAndDesc(String username) {
     try {
       Node rootNode = new RSQLParser().parse(username);
-      Specification<ResultQuestion> spec = rootNode.accept(new CustomRsqlVisitor<ResultQuestion>());
+      Specification<ResultQuestion> spec = rootNode.accept(new CustomRsqlVisitor<>());
       Sort sortOrder = Sort.by("numberPoint").descending();
       List<ResultQuestion> page = baseRepository().findAll(spec, sortOrder);
       List<ResultQuestionDto> rs =

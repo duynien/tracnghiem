@@ -26,18 +26,18 @@ public class GenericRsqlSpecBuilder<T> {
 
     List<Specification<T>> specs =
         logicalNode.getChildren().stream()
-            .map(node -> createSpecification(node))
+            .map(this::createSpecification)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
     Specification<T> result = specs.get(0);
     if (logicalNode.getOperator() == LogicalOperator.AND) {
       for (int i = 1; i < specs.size(); i++) {
-        result = Specification.where(result).and(specs.get(i));
+        result = Objects.requireNonNull(Specification.where(result)).and(specs.get(i));
       }
     } else if (logicalNode.getOperator() == LogicalOperator.OR) {
       for (int i = 1; i < specs.size(); i++) {
-        result = Specification.where(result).or(specs.get(i));
+        result = Objects.requireNonNull(Specification.where(result)).or(specs.get(i));
       }
     }
 

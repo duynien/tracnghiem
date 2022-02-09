@@ -59,7 +59,7 @@ public class AskServiceImpl extends BaseServiceImpl<Ask, AskDto> implements AskS
         return new PageResponse(
             pageable.getPageNumber(), totalPage, (int) page.getTotalElements(), res);
       }
-      if (filter != null) {
+      else{
         Node rootNode = new RSQLParser().parse(filter);
         Specification<Ask> spec = rootNode.accept(new CustomRsqlVisitor<Ask>());
         Page<Ask> page = baseRepository().findAll(spec, pageable);
@@ -78,6 +78,5 @@ public class AskServiceImpl extends BaseServiceImpl<Ask, AskDto> implements AskS
       e.printStackTrace();
       throw new NotFoundException("Không tìm thấy dữ liệu");
     }
-    throw new NotFoundException("Không tìm thấy dữ liệu");
   }
 }

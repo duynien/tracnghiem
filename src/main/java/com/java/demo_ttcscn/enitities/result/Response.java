@@ -6,8 +6,6 @@ public class Response implements Serializable {
     private boolean status = true;
     private Object content;
 
-    public Response() {}
-
     public Response(boolean status, Object content) {
         this.status = status;
         this.content = content;

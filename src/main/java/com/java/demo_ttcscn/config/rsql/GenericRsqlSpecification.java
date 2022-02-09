@@ -86,20 +86,17 @@ public class GenericRsqlSpecification<T> implements Specification<T> {
 
     final Class<? extends Object> type = root.get(property).getJavaType();
 
-    final List<Object> args =
-        arguments.stream()
-            .map(
-                arg -> {
-                  if (type.equals(Integer.class)) {
-                    return Integer.parseInt(arg);
-                  } else if (type.equals(Long.class)) {
-                    return Long.parseLong(arg);
-                  } else {
-                    return arg;
-                  }
-                })
-            .collect(Collectors.toList());
-
-    return args;
+    return arguments.stream()
+        .map(
+            arg -> {
+              if (type.equals(Integer.class)) {
+                return Integer.parseInt(arg);
+              } else if (type.equals(Long.class)) {
+                return Long.parseLong(arg);
+              } else {
+                return arg;
+              }
+            })
+        .collect(Collectors.toList());
   }
 }
